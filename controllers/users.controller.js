@@ -72,7 +72,7 @@ class UserController {
 
   async getUsers(req, res, next) {
     try {
-      return res.json("adisfnalsdnc")
+      return res.json("adisfnalsdnc");
     } catch (e) {
       next(e);
     }

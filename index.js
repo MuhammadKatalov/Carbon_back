@@ -1,23 +1,35 @@
-const express = require("express");
+require('dotenv').config()
+const express = require('express');
+const cors = require('cors');
+const cookieParser = require('cookie-parser')
+const mongoose = require('mongoose');
+const router = require('./routes/index')
+const errorMiddleware = require('./middlewares/error-middleware');
 
-const mongoose = require("mongoose");
-const cors = require("cors");
+const PORT = process.env.PORT || 5000;
+const app = express()
 
-const app = express();
-const port = 4001;
 app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded());
+app.use(cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL
+}));
+app.use(router);
+app.use(errorMiddleware);
 
-app.use(cors());
 
-app.use(require("./routes"));
+const start = async () => {
+    try {
+        await mongoose.connect(process.env.DB_URL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        })
+        app.listen(PORT, () => console.log(`Example app listening at http://localhost:${PORT}`))
+    } catch (e) {
+        console.log(e);
+    }
+}
 
-mongoose
-  .connect(
-    "mongodb+srv://bootcamp:bootcamp@cluster0.qvq9t.mongodb.net/EXC?retryWrites=true&w=majority"
-  )
-  .then(() => console.log("Успешно соединились с сервером MongoDB"))
-  .catch(() => console.log("Ошибка при соединении с сервером MongoDB"));
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+start()
